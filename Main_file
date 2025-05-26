@@ -1,0 +1,422 @@
+import time
+import random
+from tkinter import *
+
+root = Tk()
+
+# Make window 300x150 and place at position (50,50)
+root.geometry("600x600")
+
+root.title("brick breaker")
+root.geometry("600x600")
+root.resizable(height=False, width=False)
+root.wm_attributes("-topmost",1)
+root.configure(background='yellow')
+
+
+my_2text = Label(root, text='WELCOME TO BRICK BREAKER!',fg='blue')
+my_2text.config(font=("Courier", 38))
+
+my_2text.pack()
+my_2text.place(x=10, y=90)
+my_2text.configure(background='red')
+
+
+my_text = Label(root, text='WHAT DO YOU WANNA DO?',fg='blue')
+my_text.config(font=("Courier", 30,))
+my_text.pack()
+my_text.place(x=10, y=240)
+my_text.configure(background='red')
+# Create a button that will destroy the main window when clicked
+exit_button = Button(root, text='2.EXIT!',fg='red',relief=RAISED, command=root.destroy,padx=5, pady=5,bg='navy', bd =  8, 
+                      highlightthickness=4, 
+                      highlightcolor="#37d3ff", 
+                      highlightbackground="#37d3ff", 
+                      borderwidth=4)
+exit_button.config(font=("Courier", 30))
+exit_button.pack()
+exit_button.place(x=10, y=360)
+
+
+rectX=[
+            [5,100],
+            [100,200],
+            [200,300],
+            [300,400],
+            [400,495],
+            [5,100],
+            [100,200],
+            [200,300],
+            [300,400],
+            [400,495],
+            [5,100],
+            [100,200],
+            [200,300],
+            [300,400],
+            [400,495],
+            [5,100],
+            [100,200],
+            [200,300],
+            [300,400],
+            [400,495],
+            [5,100],
+            [100,200],
+            [200,300],
+            [300,400],
+            [400,495],
+            ]
+
+
+
+rectY=[
+            [40,60],
+            [40,60],
+            [40,60],
+            [40,60],
+            [40,60],
+            [60,80],
+            [60,80],
+            [60,80],
+            [60,80],
+            [60,80],
+            [80,100],
+            [80,100],
+            [80,100],
+            [80,100],
+            [80,100],
+            [100,120],
+            [100,120],
+            [100,120],
+            [100,120],
+            [100,120],
+            [20,40],
+            [20,40],
+            [20,40],
+            [20,40],
+            [20,40]
+            ]
+
+global score
+
+startPaddleModTime=0
+
+playerReady=False
+
+class Ball:
+      def __init__(self,canvas,paddle,color):
+            self.canvas=canvas
+            self.paddle=paddle
+            self.position=canvas.create_oval(245,460,255,470,fill=color,tag="ballInitial")
+            angle=[-3,-2,-1,1,2,3]
+            random.shuffle(angle)
+            self.direction=angle[0]
+            self.speed=8
+            self.startPaddleModTime=0
+            self.startPaddleSpeedModTime=0
+            self.paddleSpeedPower=True
+            self.paddleSpeedPower1=True
+            self.startBallSpeedModTime=0
+            self.ballSpeedPower=True
+            self.lifeLineMod=False
+            self.groundHit=False
+            self.scoretrue=0
+  
+
+      def restoreBall(event):
+            currentPosition=self.canvas.coords(self.position)
+            self.canvas.delete("ballInitial")
+            self.position=canvas.create_oval(currentPosition[0],currentPosition[1],currentPosition[2],currentPosition[3],fill="blue")
+
+            
+      def restorePaddle(self,color):
+            paddleCoordinates=paddle.canvas.coords(paddle.position)
+            self.canvas.delete("paddleInitial")
+            paddleCoordinates[0]+=13
+            paddleCoordinates[2]-=13
+            paddle.position=paddle.canvas.create_rectangle(paddleCoordinates[0],paddleCoordinates[1],paddleCoordinates[2],paddleCoordinates[3],fill=color,tag="paddleInitial")
+            
+      def draw(self,canvas,brickX,brickY,score):
+           
+            self.canvas=canvas
+            self.canvas.move(self.position,self.direction,self.speed)
+            currentPosition=canvas.coords(self.position)
+            paddlePosition=self.canvas.coords(self.paddle.position)
+            if currentPosition[1]<=0:
+                  self.speed*=-1
+            if currentPosition[3]>=490:
+                  print("GameOver")
+                  self.canvas.create_text(250,250,text="The ball hit the ground!",tag="pressed",font=("Algerian",40))
+                  self.canvas.create_text(250,295,text="Game Over!",tag="pressed2",font=("Algerian",40))
+
+                  
+                  ball.groundHit=True
+            if currentPosition[0]<=0:
+                  self.direction*=-1
+            if currentPosition[2]>=484:
+                  self.direction*=-1
+            if self.lifeLineMod==True and currentPosition[3]>=477:
+                  print("In Mod If")
+                  self.canvas.delete("LifeLineMod")
+                  self.speed*=-1
+                  self.lifeLineMod=False
+                  
+                  
+      
+            if currentPosition[2]>=paddlePosition[0] and currentPosition[0]<=paddlePosition[2] and currentPosition[3]>=paddlePosition[1] and currentPosition[3]>=paddlePosition[3]:
+                  print("Collide")
+                  self.speed*=-1
+
+            for i in range(0,25):
+                  
+                  if currentPosition[2]>=brickX[i][0] and currentPosition[0]<=brickX[i][1] and currentPosition[1]>=brickY[i][0] and currentPosition[3]<=brickY[i][1] :#and currentPosition[3]>=brickY[i][1]:
+                        self.speed*=-1
+                        #print ("inside the delete-if",str(i+1))
+                        #print(brickX[i],brickY[i],currentPosition)
+                        #print (canvas.coords(str(i+1)))
+                        #print (canvas.coords(str(i)))
+                        #print (canvas.coords(str(i-1)))
+                        #print (canvas.coords(str(i-2)))
+                        #print (canvas.coords(str(i+2)))
+                        for innerI in range (0,25):
+                            #jinner=0
+                            
+                            hitcoords=canvas.coords(str(innerI))
+                            
+                            #print(type(hitcoords[len(hitcoords)-1]))
+                    
+                            #print(hitcoords[1])
+                            #if canvas.coords(str(innerI)) == [brickX[innerI][jinner], brickY[innerI][jinner], brickX[innerI][jinner+1], brickY[innerI][jinner+1] ] :
+                            #if canvas.coords(str(innerI)) == [0,0,0,0] :  
+                            if len(hitcoords) > 2 :
+                                if hitcoords[0]==brickX[i][0] and hitcoords[2]==brickX[i][1] and hitcoords[1]==brickY[i][0] and hitcoords[3]==brickY[i][1]:
+                                    print(hitcoords)
+                                    print(score)
+                                    canvas.delete(str(innerI))
+                                    canvas.delete("scoretext2")
+                                    self.scoretrue+=1
+                                    canvas.create_text(500,550,text="Score :" + str(self.scoretrue), tag="scoretext2", fill="black",font=("Algerian",30))
+                        '''
+                        print(brickX[i+1][0])
+                        print(brickX[i+1][1])
+                        print(brickY[i+1][0])
+                        print(brickY[i+1][1])
+                        '''
+                        
+                        
+                        brickX[i][0]=brickX[i][1]=brickY[i][0]=brickY[i][1]=0
+
+
+                        if i==19:
+                              self.canvas.create_line(0,476,500,476,width=2,fill="turquoise",tag="LifeLineMod")
+                              self.lifeLineMod=True
+
+                        if i==5:
+                              print("Ball Speed Mod")
+                              self.speed=8
+                              self.startBallSpeedModTime=time.time()                          
+
+                        if i==11:
+                              print("Paddle Speed Mod")
+                              paddleCoordinates=paddle.canvas.coords(paddle.position)
+                              self.canvas.delete("paddleInitial")
+                              paddle.position=paddle.canvas.create_rectangle(paddleCoordinates[0],paddleCoordinates[1],paddleCoordinates[2],paddleCoordinates[3],fill="black",tag="paddleInitial",width=2)
+                              paddle.paddleSpeed=9
+                              self.startPaddleSpeedModTime=time.time()
+                        
+                        if i==2:
+                              paddleCoordinates=paddle.canvas.coords(paddle.position)
+                              self.canvas.delete("paddleInitial")
+                              paddleCoordinates[0]-=13
+                              paddleCoordinates[2]+=13
+                              paddle.position=paddle.canvas.create_rectangle(paddleCoordinates[0],paddleCoordinates[1],paddleCoordinates[2],paddleCoordinates[3],fill="black",tag="paddleInitial",width=2)
+                              self.startPaddleModTime=time.time()
+                                    
+                        break
+
+            
+
+class Paddle:
+      def __init__(self,canvas,color):
+            self.canvas=canvas
+            self.paddleSpeed=9
+            self.paddleSpeedL=self.paddleSpeed
+            self.paddleSpeedR=self.paddleSpeed
+            self.direction=0
+            self.x1=205
+            self.x2=285
+            self.y1=470
+            self.y2=480
+            self.position=self.canvas.create_rectangle(self.x1,self.y1,self.x2,self.y2,fill=color,tag="paddleInitial")
+            
+            self.canvas.bind_all('<KeyPress-Right>',self.moveRight)
+            self.canvas.bind_all('<KeyRelease-Right>',self.moveStop)
+
+            self.canvas.bind_all('<KeyPress-Left>',self.moveLeft)
+            self.canvas.bind_all('<KeyRelease-Left>',self.moveStop)
+            
+      def moveLeft(self,event):
+            currentPosition=self.canvas.coords(self.position)
+            if currentPosition[0]>=2:
+                  self.direction=self.paddleSpeedL
+                  self.direction*=-1
+                  self.paddleSpeedR=self.paddleSpeed
+                  
+      def moveRight(self,event):
+            currentPosition=self.canvas.coords(self.position)
+            if currentPosition[2]<=498:
+                  self.direction=self.paddleSpeedR
+                  self.direction*=1
+                  self.paddleSpeedL=self.paddleSpeed
+                  
+      def moveStop(self,event):
+            self.direction=0
+
+
+      def changeSize(self):
+            self.x1=2000
+            self.x2=3200
+      
+      def draw(self):
+            self.canvas.move(self.position,self.direction,0)
+            currentPosition=self.canvas.coords(self.position)
+            if currentPosition[0]<=0:
+                  self.paddleSpeedL=0
+            if currentPosition[2]>=500:
+                  self.paddleSpeedR=0
+
+
+
+
+# Create a button with a custom callback
+
+
+def drawBricks(canvas,x1,y1,x2,y2,i,color):
+        print(canvas.coords(str(i)))
+        canvas.create_rectangle(x1,y1,x2,y2,fill=color,width=2,tag=str(i))
+        print(x1,y1,x2,y2)
+        print(str(i))
+        print(canvas.coords(str(i)))
+    
+    
+
+def startGame(canvas,ball,paddle,score):
+      print("Game Started")
+      
+      score=0
+      canvas.delete("pressed")
+      canvas.delete("scoretext")
+      while ball.groundHit!=True:
+            currentTime=time.time()
+            ball.draw(canvas,rectX,rectY,score)
+            paddle.draw()
+            root.update_idletasks()
+            root.update()
+            time.sleep(0.01)
+
+
+            if ((currentTime-ball.startBallSpeedModTime)>=5 and (currentTime-ball.startBallSpeedModTime)<=6) and ball.ballSpeedPower==True:
+                  print("ball speed mod over!!!")
+                  if ball.speed>0:
+                        ball.speed=8
+                  elif ball.speed<0:
+                        ball.speed=8
+                  ball.ballSpeedPower=False
+                  
+                  ball.currentPosition=ball.canvas.coords(ball.position)
+                  ball.canvas.delete("ballInitial")
+                  ball.position=canvas.create_oval(ball.currentPosition[0],ball.currentPosition[1],ball.currentPosition[2],ball.currentPosition[3],fill="blue")
+                  ball.ballSpeedPower=False
+            
+            if ((currentTime-ball.startPaddleSpeedModTime)>=5 and (currentTime-ball.startPaddleSpeedModTime)<=6) and ball.paddleSpeedPower1==True:
+                  paddle.paddleSpeed=9
+                  paddleCoordinates=paddle.canvas.coords(paddle.position)
+                  canvas.delete("paddleInitial")
+                  paddle.position=paddle.canvas.create_rectangle(paddleCoordinates[0],paddleCoordinates[1],paddleCoordinates[2],paddleCoordinates[3],fill="black",tag="paddleInitial",width=2)
+                  ball.paddleSpeedPower1=False
+            
+            if ((currentTime-ball.startPaddleModTime)>=5 and (currentTime-ball.startPaddleModTime)<=6)and ball.paddleSpeedPower==True:
+                  ball.restorePaddle("black")
+                  ball.paddleSpeedPower=False
+            
+def event_lambda(f, *args, **kwds ):
+    return lambda event, f=f, args=args, kwds=kwds : f( *args, **kwds )         
+
+def my_callback() :
+    print("The button was clicked!")
+    # Prints to console not the GUI
+    
+
+    for ele in root.winfo_children():
+        ele.destroy()
+    global score
+    score=0
+
+    global canvas
+    canvas = Canvas(width=600, height=600,bd=0, highlightbackground='black', highlightthickness=5,highlightcolor='black',bg='light green')
+    canvas.pack()
+    canvas.delete("all")
+    global paddle
+    paddle=Paddle(canvas,"black") 
+    global ball
+    ball=Ball(canvas,paddle,"blue")  
+    for i in range(0,25):
+      j=0
+      if i==2:
+            color="yellow"
+      elif i==6:
+            color="yellow"
+      elif i==8:
+            color="yellow"
+      elif i==19:
+            color="yellow"
+      elif i==17:
+            color="yellow"
+      elif i==10:
+            color="turquoise"
+      elif i==9:
+            color="red"
+      elif i==12:
+            color="red"
+      elif i==14:
+            color="turquoise"
+      elif i==11:
+            color="grey"
+      elif i==15:
+            color="yellow"
+      elif i==13:
+            color="grey"
+      elif i==5:
+            color="red"
+      elif i==4:
+            color="turquoise"
+      elif i==0:
+            color="turquoise"
+      elif i==2:
+            color="yellow"
+      
+      else:
+            color= "firebrick"
+      canvas.create_rectangle(rectX[i][j], rectY[i][j], rectX[i][j+1], rectY[i][j+1],fill=color,width=2,tag=str(i))
+      # drawBricks(canvas,rectX[i][j], rectY[i][j], rectX[i][j+1], rectY[i][j+1],i,color)
+    
+    canvas.create_text(520,570,text="SCORE :" + str(score), tag="scoretext", fill="black",font=("Algerian",30))
+    canvas.create_text(250,250,text="Hit Spacebar when ready!",tag="pressed",fill="blue",font=("Algerian",40))
+    event_handler = event_lambda(startGame, canvas,ball,paddle,score)
+    canvas.bind_all("<space>",event_handler)
+
+    # Draw blue line from top left to bottom right with wide dashes
+    
+print("here")
+#print_button = Button(root, text='1.PLAY THE GAME!',fg="blue", relief=RAISED, borderwidth=3, command=my_callback,padx=50, pady=5,bg='navy', bd=8)
+print_button = Button(root, text='1.PLAY THE GAME!',fg="blue", relief=RAISED, command=my_callback,padx=5, pady=5,bg='navy', bd =  10, 
+                      highlightthickness=4, 
+                      highlightcolor="#37d3ff", 
+                      highlightbackground="#37d3ff", 
+                      borderwidth=4)
+
+print_button.pack()
+print_button.config(font=("Courier", 30),bd=8,relief=RAISED)
+
+print_button.place(x=10, y=300)  
+
+root.mainloop()
