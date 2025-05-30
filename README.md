@@ -1,6 +1,6 @@
 # Brick Breaker
 
-The Brick Breaker game is a classic arcade-style game developed using Python’s Tkinter library for the graphical user interface[1]. In this game, the player controls a paddle at the bottom of the window, moving it left or right to bounce a ball upward. The objective is to break all the colored bricks arranged in rows at the top of the play area by hitting them with the ball, while preventing the ball from falling below the paddle.
+The Brick Breaker game is a classic arcade-style game developed using Python’s Tkinter library for the graphical user interface. In this game, the player controls a paddle at the bottom of the window, moving it left or right to bounce a ball upward. The objective is to break all the colored bricks arranged in rows at the top of the play area by hitting them with the ball, while preventing the ball from falling below the paddle.
 
 The game window is set to a fixed size of 600x600 pixels with a vibrant background and welcoming labels, enhancing the visual appeal. The interface provides two main options: to start playing or to exit the game. When the player chooses to play, the interface transitions to the game canvas, where the paddle, ball, and bricks are drawn. The paddle is controlled using the left and right arrow keys, and the game starts when the spacebar is pressed.
 
